@@ -10,11 +10,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 
-public class GlobalExceptionHandler extends RuntimeException{
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> notFoundHandler(ResourceNotFoundException e){
-         Map map = new HashMap();
+         Map<String, Object> map = new HashMap<>();
          map.put("message", e.getMessage());
          map.put("success", false);
          map.put("status", HttpStatus.NOT_FOUND);
