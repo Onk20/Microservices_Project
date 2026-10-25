@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: ${SERVER_PORT:8085}
 
 spring:
   application:
@@ -7,16 +7,19 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 5s
       routes:
         - id: USER_SERVICE
           uri: lb://USERSERVICE
           predicates:
-            - Path= /users/**
+            - Path=/users/**
 
         - id: HOTEL_SERVICE
           uri: lb://HOTELSERVICE
           predicates:
-              - Path=/hotels/**, /staffs/**
+              - Path=/hotels/**,/hotel/**,/staffs/**
 
 
         - id: RATING_SERVICE
@@ -28,17 +31,20 @@ spring:
 eureka :
   instance :
     prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}:${random.uuid}
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
 
-## Okta Configuration for api gateway
-#okta:
-#  oauth2:
-#    issuer: https://dev-86994760.okta.com/oauth2/default
-#    audience: api://default
-#    client-id: 0oanmope51J9okFoq5d7
-#    client-secret: dsmVuiDBvlggeOdLHEyuNyY_rFb6B7dukKJbLdizr3bxYIoO3KS0GPc-GIN5aQ4s
-#    scopes: openid, profile, email, offline_access
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
