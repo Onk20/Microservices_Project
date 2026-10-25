@@ -2,6 +2,7 @@ package com.lcwd.hotel.HotelService.controller;
 
 import com.lcwd.hotel.HotelService.entities.Hotel;
 import com.lcwd.hotel.HotelService.services.HotelService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,14 @@ public class HotelController {
     private HotelService hotelService;
 
     @PostMapping("/hotels")
-    public ResponseEntity<Hotel> createHotel(@RequestBody Hotel hotel){
+    public ResponseEntity<Hotel> createHotel(@Valid @RequestBody Hotel hotel){
 
         Hotel createdHotel = hotelService.createHotel(hotel);
         return new ResponseEntity<Hotel>(createdHotel, HttpStatus.CREATED);
     }
 
 
-    @GetMapping("/hotel/{hotelId}")
+    @GetMapping({"/hotels/{hotelId}", "/hotel/{hotelId}"})
     public ResponseEntity<Hotel> getSingleHotel(@PathVariable  String hotelId){
 
         Hotel hotel = hotelService.getSpecificHotelById(hotelId);
