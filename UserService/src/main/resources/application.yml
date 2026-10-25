@@ -1,48 +1,50 @@
 
 
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
 
 spring:
 
   cloud:
     config:
       enabled: false
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 3000
   application:
-    name: USERSERVICEFROMCONFIG
+    name: USERSERVICE
   datasource:
-    url: jdbc:mysql://localhost:3306/microservices
-    username : root
-    password : root
+    url: ${DB_URL:jdbc:mysql://localhost:3306/microservices}
+    username: ${DB_USERNAME:userapp}
+    password: ${DB_PASSWORD}
 
 
 
 
 
   jpa:
+    open-in-view: false
     hibernate:
-      ddl-auto : update
+      ddl-auto: ${DDL_AUTO:update}
 
-    show-sql : true
+    show-sql: false
 
     properties :
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-#  config:
-#    import: configserver:http://localhost:8086
-#
-#  profiles:
-#    active: dev
-
 eureka :
   instance :
     prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}:${random.uuid}
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
 
 management:
   health:
@@ -51,17 +53,21 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,info
 
   endpoint:
     health:
-      show-details: always
+      show-details: never
+      probes:
+        enabled: true
 
 
 resilience4j:
   circuitbreaker:
     instances:
       ratingHotelBreaker:
+        ignoreExceptions:
+          - com.lcwd.user.service.exceptions.ResouceNotFoundException
         registerHealthIndicator: true
         eventConsumerBufferSize: 10
         failureRateThreshold: 50
@@ -71,17 +77,3 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowSize: 10
         slidingWindowType: COUNT_BASED
-
-#retry:
-#  instances:
-#    ratingHotelService:
-#      max-attempts: 3
-#      wait-duration: 5s
-
-
-ratelimiter:
-  instances:
-    userRateLimiter:
-      limit-refresh-period: 4s
-      limit-for-period: 2
-      timeout-duration: 4s
