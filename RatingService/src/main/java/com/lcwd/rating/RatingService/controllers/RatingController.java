@@ -2,7 +2,7 @@ package com.lcwd.rating.RatingService.controllers;
 
 import com.lcwd.rating.RatingService.entities.Rating;
 import com.lcwd.rating.RatingService.services.RatingService;
-import jakarta.websocket.server.PathParam;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class RatingController {
     private RatingService ratingService;
 
     @PostMapping("/ratings")
-    public ResponseEntity<Rating> createRating(@RequestBody Rating rating){
+    public ResponseEntity<Rating> createRating(@Valid @RequestBody Rating rating){
 
         Rating createdRating = ratingService.createRating(rating);
 
